@@ -13,6 +13,8 @@ The following packages were used to build this game:
  - [Gameboy Tile Designer](http://www.devrs.com/gb/hmgd/gbtd.html) (Recommended: v2.2)
  - [Gameboy Map Builder](http://www.devrs.com/gb/hmgd/gbmb.html) (Recommended: v1.8)
  - [EZFlashJr Kernal](http://www.ezflash.cn/product/ezflash-junior/) (Recommended: Firmware v4 K1.04e)
+ - [GBT-Player](https://github.com/gingemonster/GamingMonstersGameBoySampleCode/tree/master/19_making_music) (Recommnded: Modified version found in gingemonster's tutorial repository)
+ - [OpenMPT](https://openmpt.org/) (Recommnded: v1.29)
 
 # Builders
 This game can be built with either using MakeFile or using CMakeLists, both are provided.  
