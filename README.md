@@ -36,7 +36,19 @@ In windows use following instructions:
  - Click Environment Variables. In the section System Variables, find the PATH environment variable and select it. Click Edit. If the PATH environment variable does not exist, click New.
  - In the Edit System Variable (or New System Variable) window, add the directory to the bin folder of GBDK to the list. Click OK. Close all remaining windows by clicking OK.
 
+## Generate music
+Music is generated using [OpenMPT](https://openmpt.org/) [Tutorial](https://www.youtube.com/watch?v=4W7j3GQSmvU)  
+This creates a .mod file which can be used with 'mod2gbt' a tool from [gbt_player](https://github.com/AntonioND/gbt-player) to create files that can be compiled with gbdk. Offically this is no longer supported and the latest version of the repository does not work with gbdk. Instead use files from gingemonster's tutorial [here](https://github.com/gingemonster/GamingMonstersGameBoySampleCode/tree/master/19_making_music).
+
+You should end up with 'gbt_player.h', 'gbt_player.s', 'gbt_player_bank.s'.  
+You need to generate a '.c' file from the the '.mod' file using the mod2gbt tool:
+```
+mod2gbt spaceCalm.mod spaceSong -c 2
+```
+This will create an 'output.c' file. Copy this into the src folder to use in the game build. 
+
 ## Make
+*WARNING: make.bat currently only way to build due to complete build of adding music*
 There are three approaches to build games with GBDK; make, cmake, or directly calling the GBDK compiler.  
 Each of the examples in this repository have a MakeFile and CMakeLists.txt that can be used to build them whether you are using make or cmake. Hopefull this will be useful when you build your own games to show what's needed.  
 *Note: Expects the GBDK bin directory to be in the PATH environment variable so that lcc is accessible.*
@@ -110,7 +122,6 @@ PATH_TO_BGB\bgb.exe -rom PATH_TO_REPO\build\space.gb
 [Googulator](https://www.googulator.com) is an online GameBoy emulator that runs in the browser. It relies on a Google drive for loading game files so you will need a Google account.  
 
 Sign in and link your Google drive account. Then go to the library tab, click 'Add games' and select 
-
 
 ## EZ Flash Jr
 You can flash the .gb file generated to a gameboy cartridge. This is easiest with EZ Flash Jr [link](http://www.ezflash.cn/product/ezflash-junior/).  

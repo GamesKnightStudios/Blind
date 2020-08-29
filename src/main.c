@@ -5,7 +5,7 @@
 #include "SpaceShipTiles.h"
 #include "gbt_player.h"
 
-extern const unsigned char * song_Data[];
+extern const unsigned char * spaceSong_Data[];
 
 #define WHITE  0
 #define SILVER 1
@@ -15,6 +15,10 @@ extern const unsigned char * song_Data[];
 
 #define SHIP_TYPE_UD 0
 #define SHIP_TYPE_LR 1
+#define SPACESHIP_TILE_LEN 8
+
+#define SONG_BANK 2
+#define SONG_SPEED 7
 
 UINT8 ship_x, ship_y;
 
@@ -61,23 +65,19 @@ void anyKey()
 void main() {
     ship_x = 83, ship_y = 83;
 
-    //disable_interrupts();
+    disable_interrupts();
 
-    //gbt_play(song_Data, 2, 7);
+    gbt_play(spaceSong_Data, SONG_BANK, SONG_SPEED);
     //gbt_loop(1);
-    //set_interrupts(VBL_IFAG);
+    set_interrupts(VBL_IFLAG);
 
-    //enable_interrupts();
+    enable_interrupts();
     
-    // start screen (press start to continue)
-    //gotogxy(3,8); // set text start position
-    //gprintf("Press Start...");
+    // TODO start screen (press start to continue)
     //waitpad(J_START); // wait for start
-    //gotogxy(3,8); // reset text start position
-    //gprintf("              "); // clear message
 
     // load background
-    set_bkg_data(0, 7, SpaceBgTiles ); //load background tile set
+    set_bkg_data(0, 8, SpaceBgTiles ); //load background tile set
     set_bkg_tiles( 0, 0, SpaceBgMapWidth, SpaceBgMapHeight, SpaceBgMap); //load background map
     SHOW_BKG;
 	
@@ -86,14 +86,14 @@ void main() {
 
     // load spaceship sprite
     SPRITES_8x8;
-    set_sprite_data(0, 8, SpaceShipTiles);
+    set_sprite_data(0, SPACESHIP_TILE_LEN, SpaceShipTiles);
     set_sprite_tile(0, SHIP_TYPE_LR);
     move_sprite(0, ship_x, ship_y); // set ship sprite inital position
     SHOW_SPRITES; // display sprites
     
     // game loop
     while(1) {
-        //wait_vbl_done();
+        wait_vbl_done();
 
         updateKeys(); // check key presses
         // move sprite if joykey pressed
@@ -120,9 +120,8 @@ void main() {
             }
             move_sprite(0, ship_x, ship_y); // move sprite
         }
-        
-        //gbt_update();
+        gbt_update();
         // delay to control frame rate
-        performantDelay(2);
+        //performantDelay(2);
     }
 }
