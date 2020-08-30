@@ -415,7 +415,7 @@ void main() {
     disable_interrupts();
 
     gbt_play(spaceSong_Data, SONG_BANK, SONG_SPEED);
-    //gbt_loop(1);
+    gbt_loop(1);
     set_interrupts(VBL_IFLAG);
 
     enable_interrupts();
