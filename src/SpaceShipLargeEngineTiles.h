@@ -1,8 +1,8 @@
 /*
 
- SPACESHIPTILES.C
+ SPACESHIPLARGEENGINETILES.H
 
- Tile Source File.
+ Include File.
 
  Info:
   Form                 : All tiles as one unit.
@@ -22,13 +22,10 @@
 
 */
 
-/* Start of tile array. */
-unsigned char SpaceShipTiles[] =
-{
-  0x00,0x18,0x18,0x00,0x18,0x00,0x18,0x00,
-  0x18,0x24,0x18,0x24,0x00,0x7E,0x00,0x66,
-  0x00,0x00,0x00,0xC0,0x00,0xF0,0x3E,0x41,
-  0x3E,0x41,0x00,0xF0,0x00,0xC0,0x00,0x00
-};
 
-/* End of SPACESHIPTILES.C */
+/* Bank of tiles. */
+#define ShipLargeEngineTilesBank 0
+/* Start of tile array. */
+extern unsigned char ShipLargeEngineTiles[];
+
+/* End of SPACESHIPLARGEENGINETILES.H */

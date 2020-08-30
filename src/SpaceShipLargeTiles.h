@@ -1,8 +1,8 @@
 /*
 
- SPACESHIPTILES.C
+ SPACESHIPLARGETILES.H
 
- Tile Source File.
+ Include File.
 
  Info:
   Form                 : All tiles as one unit.
@@ -10,7 +10,7 @@
   Compression          : None.
   Counter              : None.
   Tile size            : 8 x 8
-  Tiles                : 0 to 1
+  Tiles                : 0 to 3
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -22,13 +22,10 @@
 
 */
 
-/* Start of tile array. */
-unsigned char SpaceShipTiles[] =
-{
-  0x00,0x18,0x18,0x00,0x18,0x00,0x18,0x00,
-  0x18,0x24,0x18,0x24,0x00,0x7E,0x00,0x66,
-  0x00,0x00,0x00,0xC0,0x00,0xF0,0x3E,0x41,
-  0x3E,0x41,0x00,0xF0,0x00,0xC0,0x00,0x00
-};
 
-/* End of SPACESHIPTILES.C */
+/* Bank of tiles. */
+#define SpaceShipLargeTilesBank 0
+/* Start of tile array. */
+extern unsigned char SpaceShipLargeTiles[];
+
+/* End of SPACESHIPLARGETILES.H */
