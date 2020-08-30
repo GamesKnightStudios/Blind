@@ -38,8 +38,10 @@ extern const unsigned char * spaceSong_Data[];
 #define LARGE_SHIP_TILE_INDEX 5
 #define LARGE_SHIP_TILE_COUNT 4
 
-#define LARGE_SHIP_ENGINE_SPRITE_INDEX 7
-#define LARGE_SHIP_ENGINE_SPRITE_COUNT 1
+#define LARGE_SHIP_ENGINE_L_SPRITE_INDEX 7
+#define LARGE_SHIP_ENGINE_L_SPRITE_COUNT 1
+#define LARGE_SHIP_ENGINE_R_SPRITE_INDEX 8
+#define LARGE_SHIP_ENGINE_R_SPRITE_COUNT 1
 #define LARGE_SHIP_ENGINE_TILE_INDEX 26
 #define LARGE_SHIP_ENGINE_TILE_COUNT 2
 
@@ -96,6 +98,34 @@ void TilePos_8x8(UINT8 sprite_index, UINT8 x, UINT8 y){
     move_sprite(sprite_index, x, y);
 }
 
+void TileDir_8x8_flip(UINT8 sprite_index, UINT8 tile_index, UINT8 dir){
+    // 0: up
+    // 1: down
+    // 2: left
+    // 3: right
+
+    // expects vertical 8x8 shape to be in first tile
+    // and horizontal 8x8 shape to be in second tile
+
+    if (dir == 0){ //up
+        set_sprite_tile(sprite_index, tile_index);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPX);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPY);
+    } else if (dir == 1){ //down
+        set_sprite_tile(sprite_index, tile_index);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPX);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPY);
+    } else if (dir == 2){ //left
+        set_sprite_tile(sprite_index, tile_index+1);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPX);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPY);
+    } else if (dir == 3){ //right
+        set_sprite_tile(sprite_index, tile_index+1);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPX);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPY);
+    }
+}
+
 void TileDir_8x8(UINT8 sprite_index, UINT8 tile_index, UINT8 dir){
     // 0: up
     // 1: down
@@ -107,16 +137,20 @@ void TileDir_8x8(UINT8 sprite_index, UINT8 tile_index, UINT8 dir){
 
     if (dir == 0){ //up
         set_sprite_tile(sprite_index, tile_index);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPX);
         set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPY);
     } else if (dir == 1){ //down
         set_sprite_tile(sprite_index, tile_index);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPX);
         set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPY);
     } else if (dir == 2){ //left
         set_sprite_tile(sprite_index, tile_index+1);
         set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) | S_FLIPX);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPY);
     } else if (dir == 3){ //right
         set_sprite_tile(sprite_index, tile_index+1);
         set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPX);
+        set_sprite_prop(sprite_index, get_sprite_prop(sprite_index) & ~S_FLIPY);
     }
 }
 
@@ -260,25 +294,44 @@ void LargeShipBodyDir(UINT8 dir){
     TileDir_16x16sym(LARGE_SHIP_SPRITE_INDEX, LARGE_SHIP_TILE_INDEX, dir);
 }
 
-void LargeShipEngineInit(){
-    // load large sprite set into 2:6 (2 = start index, 4 = number of tiles to load)
+void LargeShipEngineLInit(){
     set_sprite_data(LARGE_SHIP_ENGINE_TILE_INDEX, LARGE_SHIP_ENGINE_TILE_COUNT, ShipLargeEngineTiles);
 }
 
-void LargeShipEnginePos(UINT8 x, UINT8 y){
-    TilePos_8x8(LARGE_SHIP_ENGINE_SPRITE_INDEX, x, y);
+void LargeShipEngineLPos(UINT8 x, UINT8 y){
+    TilePos_8x8(LARGE_SHIP_ENGINE_L_SPRITE_INDEX, x, y);
 }
 
-void LargeShipEngineDir(UINT8 dir){
+void LargeShipEngineLDir(UINT8 dir){
     // 0: up
     // 1: down
     // 2: left
     // 3: right
-    TileDir_8x8(LARGE_SHIP_ENGINE_SPRITE_INDEX, LARGE_SHIP_ENGINE_TILE_INDEX, dir);
+    TileDir_8x8(LARGE_SHIP_ENGINE_L_SPRITE_INDEX, LARGE_SHIP_ENGINE_TILE_INDEX, dir);
 }
 
-void HideLargeShipEngine(){
-    HideSprite(LARGE_SHIP_ENGINE_SPRITE_INDEX);
+void HideLargeShipEngineL(){
+    HideSprite(LARGE_SHIP_ENGINE_L_SPRITE_INDEX);
+}
+
+void LargeShipEngineRInit(){
+    LargeShipEngineLInit();
+}
+
+void LargeShipEngineRPos(UINT8 x, UINT8 y){
+    TilePos_8x8(LARGE_SHIP_ENGINE_R_SPRITE_INDEX, x, y);
+}
+
+void LargeShipEngineRDir(UINT8 dir){
+    // 0: up
+    // 1: down
+    // 2: left
+    // 3: right
+    TileDir_8x8_flip(LARGE_SHIP_ENGINE_R_SPRITE_INDEX, LARGE_SHIP_ENGINE_TILE_INDEX, dir);
+}
+
+void HideLargeShipEngineR(){
+    HideSprite(LARGE_SHIP_ENGINE_R_SPRITE_INDEX);
 }
 
 void SmallShipInit(){
@@ -317,7 +370,8 @@ void SmallShipState(UINT8 x, UINT8 y, UINT8 dir, UINT8 engine){
 
 void LargeShipInit(){
     LargeShipBodyInit();
-    LargeShipEngineInit();
+    LargeShipEngineLInit();
+    LargeShipEngineRInit();
 }
 
 void LargeShipState(UINT8 x, UINT8 y, UINT8 dir, UINT8 engine){
@@ -333,27 +387,26 @@ void LargeShipState(UINT8 x, UINT8 y, UINT8 dir, UINT8 engine){
 
     LargeShipBodyPos(x,y);
     LargeShipBodyDir(dir);
-    LargeShipEngineDir(dir);
-    LargeShipEnginePos(x,y+16);
-    HideLargeShipEngine();
-    if (engine == 1){
-        //
-    }
-    /*
+    LargeShipEngineLDir(dir);
+    LargeShipEngineRDir(dir);
     if (engine == 1){
         if (dir == 0){ //up
-            //LargeShipEnginePos(x,y+16);
+            LargeShipEngineLPos(x,y+16);
+            LargeShipEngineRPos(x+8,y+16);
         } else if (dir == 1){ //down
-            //LargeShipEnginePos(x,y-16);
+            LargeShipEngineLPos(x,y-8);
+            LargeShipEngineRPos(x+8,y-8);
         } else if (dir == 2){ //left
-            //LargeShipEnginePos(x+16,y);
+            LargeShipEngineLPos(x+16,y);
+            LargeShipEngineRPos(x+16,y+8);
         } else if (dir == 3){ //right
-            //LargeShipEnginePos(x-16,y);
+            LargeShipEngineLPos(x-8,y);
+            LargeShipEngineRPos(x-8,y+8);
         }
     } else {
-        //HideLargeShipEngine();
+        HideLargeShipEngineL();
+        HideLargeShipEngineR();
     }
-    */
 }
 
 void main() {
@@ -384,7 +437,7 @@ void main() {
     
     // initalise small ship sprite
     SmallShipInit();
-    SmallShipState(ship_x,ship_y,0,0);
+    SmallShipState(ship_x,ship_y-16,0,0);
 
     // initalise large ship sprite
     LargeShipInit();
@@ -415,10 +468,10 @@ void main() {
                 ship_y++;
                 ship_dir = 1;
             }
-            SmallShipState(ship_x, ship_y, ship_dir,1);
+            SmallShipState(ship_x, ship_y-16, ship_dir,1);
             LargeShipState(ship_x-4,ship_y+16,ship_dir,1);
         } else {
-            SmallShipState(ship_x, ship_y, ship_dir,0);
+            SmallShipState(ship_x, ship_y-16, ship_dir,0);
             LargeShipState(ship_x-4,ship_y+16,ship_dir,0);
         }
         gbt_update();
