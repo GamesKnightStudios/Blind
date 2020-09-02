@@ -1,17 +1,19 @@
 #include <gb/gb.h>
+#include <gb/cgb.h>
 #include <gb/drawing.h>
 #include "playerTiles.h"
-#include "playerWalkTiles.h"
-#include "level1Map.h"
-#include "level1Tiles.h"
+#include "levelMap.c"
 
 #define BLANK_SPRITE_INDEX 0
 
 UINT8 player_x, player_y, player_dir, player_type;
 UINT8 player_jump_count;
 UINT8 player_walk_count;
-UINT8 player_count_since_walk;
+UINT8 player_attack_count;
 UINT8 player_is_walking;
+UINT8 player_is_attacking;
+UINT8 player_is_on_floor;
+UINT8 player_is_jumping;
 UINT8 player_walk_index;
 UINT8 floor_y;
 UINT8 bkg_x, bkg_y;
@@ -57,12 +59,13 @@ void anyKey()
 }
 
 void PlayerInit(){
-    set_sprite_data(0, 8, playerTiles);
+    set_sprite_data(0, 30, playerTiles);
     set_sprite_tile(0, 0);
     set_sprite_tile(1, 2);
-    set_sprite_data(8, 8, playerWalkTiles);
-    set_sprite_tile(2, 8);
-    set_sprite_tile(3, 10);
+
+    UWORD spritePalette[] = {0, RGB(7,23,8), RGB(4,14,6), RGB(28,29,5)};
+
+    set_sprite_palette(0, 1, spritePalette);
 }
 
 void PlayerState(UINT8 x, UINT8 y, UINT8 dir, UINT8 type){
@@ -72,22 +75,37 @@ void PlayerState(UINT8 x, UINT8 y, UINT8 dir, UINT8 type){
 
     //Type
     //0: normal
-    //1: jump
-    //2: walk frame 1
-    //3: walk frame 2
+    //1: walk frame 1
+    //2: walk frame 2
+    //3: walk frame 3
+    //4: jump frame 1
+    //5: jump frame 2 (falling)
+    //6: attack frame 1
 
     if (type == 0){ //normal
         set_sprite_tile(0, 0);
         set_sprite_tile(1, 2);
-    } else if (type == 1){ //jump
+    } else if (type == 1){ //walk frame 1
         set_sprite_tile(0, 4);
         set_sprite_tile(1, 6);
-    } else if (type == 2){ //walk frame 1
+    } else if (type == 2){ //walk frame 2
         set_sprite_tile(0, 8);
         set_sprite_tile(1, 10);
-    } else if (type == 3){ //walk frame 2
+    } else if (type == 3){ //walk frame 3
         set_sprite_tile(0, 12);
         set_sprite_tile(1, 14);
+    } else if (type == 4){ //jump frame 1
+        set_sprite_tile(0, 16);
+        set_sprite_tile(1, 18);
+    } else if (type == 5){ //jump frame 2
+        set_sprite_tile(0, 20);
+        set_sprite_tile(1, 22);
+    } else if (type == 6){ //attack frame 1
+        set_sprite_tile(0, 24);
+        set_sprite_tile(1, 26);
+    } else if (type == 7){ //attack frame 2
+        set_sprite_tile(0, 28);
+        set_sprite_tile(1, 30);
     }
 
     if (dir == 0){
@@ -112,28 +130,33 @@ void main() {
     bkg_x = 0, bkg_y = 0;
     player_jump_count = 0;
     player_walk_count = 0;
-    player_count_since_walk = 0;
+    player_attack_count = 0;
+    player_is_jumping = 0;
     player_is_walking = 0;
+    player_is_on_floor = 0;
+    player_is_attacking = 0;
     player_walk_index = 0;
     floor_y = 104;
 
     // load backgrounds
-    set_bkg_data(0, 20, level1Tiles ); //load background tile set
-    set_bkg_tiles( 0, 0, level1MapWidth, level1MapHeight, level1Map); //load background map
-    scroll_bkg(bkg_x, bkg_y);
+    //set_bkg_data(0, 20, level1Tiles ); //load background tile set
+    //set_bkg_tiles( 0, 0, level1MapWidth, level1MapHeight, level1Map); //load background map
+    UWORD bkgPalette[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
+    set_bkg_palette(0, 1, bkgPalette);
+    set_bkg_data(0, background1_tile_count, background1_tile_data ); //load background tile set
+    set_bkg_tiles( 0, 0, background1_tile_map_width, background1_tile_map_height, background1_map_data); //load background map
+	scroll_bkg(bkg_x, bkg_y);
     SHOW_BKG;
 
     // initalise character sprite
     SPRITES_8x16;
     PlayerInit();
     PlayerState(player_x,player_y,player_dir,player_type);
-    
     SHOW_SPRITES; // display sprites
     
     // game loop
     while(1) {
         wait_vbl_done();
-        //player_is_walking = 0;
 
         updateKeys(); // check key presses
 
@@ -142,7 +165,7 @@ void main() {
         }
 
         // move sprite if joykey pressed
-        if (keyPressed(J_RIGHT) || keyPressed(J_LEFT) || keyPressed(J_UP) || keyPressed(J_DOWN)){
+        if (keyPressed(J_RIGHT) || keyPressed(J_LEFT)){
             if (keyPressed(J_RIGHT)){
                 //player_x++;
                 player_dir = 0;
@@ -157,35 +180,76 @@ void main() {
                 scroll_bkg(-1, 0);
                 player_is_walking = 1;
             }
-            if(keyPressed(J_UP)) {
-                //jump
-                player_jump_count++;
-                if (player_jump_count < 10){ // restrict jump time
-                    player_y-=3;
-                } else {
-                    player_jump_count = 10;
-                }
-            } else {
-                player_jump_count = 0;
-            }
+            
         }
+
+        /*
+        if(keyPressed(J_A)) {
+            //attack
+            player_attack_count++;
+            if (player_attack_count < 10){
+                player_is_attacking = 1;
+            } else {
+                player_is_attacking = 0;
+                player_attack_count = 10;
+            }
+        } else {
+            player_attack_count = 0;
+        }
+        */
+
+        if(keyPressed(J_UP)) {
+            //jump
+            player_jump_count++;
+            if (player_jump_count < 50){ // restrict jump time
+                player_y-=3;
+                player_is_jumping = 1;
+            } else {
+                player_jump_count = 50;
+                player_is_jumping = 0;
+            }
+        } else {
+            player_is_jumping = 0;
+            player_jump_count = 0;
+        }
+
+        if(keyPressed(J_DOWN)) {
+            player_y+=1;
+        }
+
         //Add gravity
         player_y = player_y + 1;
 
         //Check floor collision
-        if (player_y > floor_y){
+        if (player_y >= floor_y){
             player_y = floor_y;
+            player_is_on_floor = 1;
+        } else {
+            player_is_on_floor = 0;
+        }
+
+        if (player_is_attacking == 1){
+            player_type = 6; //set player type to attack frame 1
+        } else if (player_is_on_floor == 0){
+            if (player_is_jumping == 1){
+                player_type = 4; //set player type to jump frame 1
+            } else {
+                player_type = 5; //set player type to jump frame 2 (fall)
+            }
+        } else {
             if (player_is_walking == 1){
                 if (player_walk_count > 4){
                     if (player_walk_index == 0){
                         player_type = 0; //set player type to normal frame
                     } else if (player_walk_index == 1) {
-                        player_type = 2; //set player type to walk frame 1
+                        player_type = 1; //set player type to walk frame 1
                     } else if (player_walk_index == 2){
-                        player_type = 3; //set player type to walk frame 2
+                        player_type = 2; //set player type to walk frame 2
+                    } else if (player_walk_index == 3){
+                        player_type = 3; //set player type to walk frame 3
                     }
                     player_walk_index++;
-                    if (player_walk_index > 2){
+                    if (player_walk_index > 3){
                         player_walk_index = 0;
                     }
                     player_walk_count = 0;
@@ -195,9 +259,12 @@ void main() {
                 player_walk_count = 0;
                 player_type = 0;
             }
-        } else {
-            player_type = 1; //set player type to jump frame
         }
+
+        if (player_y <= 10){
+            player_y = 10;
+        }
+
         PlayerState(player_x,player_y,player_dir,player_type);
     }
 }
