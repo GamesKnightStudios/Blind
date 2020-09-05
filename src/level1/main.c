@@ -5,6 +5,9 @@
 #include "levelTiles.c"
 #include "level1Map.c"
 #include "level2Map.c"
+#include "level3Map.c"
+#include "level4Map.c"
+#include "level5Map.c"
 
 #define BLANK_SPRITE_INDEX 0
 
@@ -23,6 +26,9 @@ UINT8 platform2_state[6] = {0, 0, 0, 0, 0, 0}; //X,Y,W,H,DIR,TILE
 UINT8 platform3_state[6] = {0, 0, 0, 0, 0, 0}; //X,Y,W,H,DIR,TILE
 UINT8 platform4_state[6] = {0, 0, 0, 0, 0, 0}; //X,Y,W,H,DIR,TILE
 UINT8 platform5_state[6] = {0, 0, 0, 0, 0, 0}; //X,Y,W,H,DIR,TILE 
+
+UINT8 level_start_xs[5] = {72,8,8,8,136};
+UINT8 level_start_ys[5] = {96,96,96,96,96};
 
 UINT8 player_move_x;
 UINT8 player_move_y;
@@ -46,6 +52,12 @@ UWORD bkgPalette_normal[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)
 UWORD bkgPalette_blank[] = { RGB(0,7,5), RGB(0,7,5), RGB(0,7,5), RGB(0,7,5)};
 UWORD bkgPalette_fade1[] = { RGB(7,23,8), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
 UWORD bkgPalette_fade2[] = { RGB(4,14,6), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
+/*
+UWORD bkgPalette_normal[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
+UWORD bkgPalette_blank[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
+UWORD bkgPalette_fade1[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
+UWORD bkgPalette_fade2[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
+*/
 
 UBYTE previous_KEYS = 0;
 UBYTE keys = 0;
@@ -141,6 +153,36 @@ void PlayerInit(){
     set_sprite_palette(0, 1, spritePalette);
 }
 
+void BackgroundState(UINT8 type){
+    if (type == 0){ //hide
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 1){ //normal
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 2){ //walk frame 1
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 3){ //walk frame 2
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 4){ //walk frame 3
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 5){ //jump frame 1
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 6){ //jump frame 2
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 7){ //attack frame 1
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 8){ //attack frame 2
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 9){ //attack frame 3
+        set_bkg_palette(0, 1, bkgPalette_blank);
+    } else if (type == 10){ //attack frame 4
+        set_bkg_palette(0, 1, bkgPalette_fade1);
+    } else if (type == 11){ //attack frame 5
+        set_bkg_palette(0, 1, bkgPalette_normal);
+    } else if (type == 12){ //attack frame 6
+        set_bkg_palette(0, 1, bkgPalette_fade2);
+    }
+}
+
 void PlayerState(UINT8 x, UINT8 y, UINT8 dir, UINT8 type){
     //Dir
     //0: left
@@ -161,55 +203,42 @@ void PlayerState(UINT8 x, UINT8 y, UINT8 dir, UINT8 type){
     //12: attack frame 6
 
     if (type == 0){ //hide
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 0);
         set_sprite_tile(1, 2);
     } else if (type == 1){ //normal
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 4);
         set_sprite_tile(1, 6);
     } else if (type == 2){ //walk frame 1
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 8);
         set_sprite_tile(1, 10);
     } else if (type == 3){ //walk frame 2
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 12);
         set_sprite_tile(1, 14);
     } else if (type == 4){ //walk frame 3
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 16);
         set_sprite_tile(1, 18);
     } else if (type == 5){ //jump frame 1
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 20);
         set_sprite_tile(1, 22);
     } else if (type == 6){ //jump frame 2
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 24);
         set_sprite_tile(1, 26);
     } else if (type == 7){ //attack frame 1
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 28);
         set_sprite_tile(1, 30);
     } else if (type == 8){ //attack frame 2
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 32);
         set_sprite_tile(1, 34);
     } else if (type == 9){ //attack frame 3
-        set_bkg_palette(0, 1, bkgPalette_blank);
         set_sprite_tile(0, 36);
         set_sprite_tile(1, 38);
     } else if (type == 10){ //attack frame 4
-        set_bkg_palette(0, 1, bkgPalette_fade1);
         set_sprite_tile(0, 40);
         set_sprite_tile(1, 42);
     } else if (type == 11){ //attack frame 5
-        set_bkg_palette(0, 1, bkgPalette_normal);
         set_sprite_tile(0, 44);
         set_sprite_tile(1, 46);
     } else if (type == 12){ //attack frame 6
-        set_bkg_palette(0, 1, bkgPalette_fade2);
         set_sprite_tile(0, 48);
         set_sprite_tile(1, 50);
     }
@@ -267,13 +296,12 @@ void checkSceneCollisons(){
 }
 
 void setupLevel(UINT8 level){
+    
     if (level == 1){
-        set_bkg_data(0, 18, levelTiles ); //load background tile set
-        set_bkg_tiles( 0, 0, 20, 18, level2Map); //load background map
-        //set_bkg_data(0, level1_tile_count, level1_tile_data ); //load background tile set
-        //set_bkg_tiles( 0, 0, level1_tile_map_width, level1_tile_map_height, level1_map_data); //load background map
-        platform1_state[OBJECT_X] = 0;
-        platform1_state[OBJECT_Y] = 120;
+        set_bkg_data(0, level1Map_tile_count, level1Map_tile_data ); //load background tile set
+        set_bkg_tiles( 0, 0, 20, 18, level1Map_map_data); //load background map
+        platform1_state[OBJECT_X] = 8;
+        platform1_state[OBJECT_Y] = 112;
         platform1_state[OBJECT_W] = 160;
         platform1_state[OBJECT_H] = 24;
         platform1_state[OBJECT_DIR] = 0;
@@ -307,35 +335,33 @@ void setupLevel(UINT8 level){
         platform5_state[OBJECT_DIR] = 0;
         platform5_state[OBJECT_TILE] = 0;
     } else if (level == 2){
-        //set_bkg_data(0, 18, levelTiles ); //load background tile set
-        //set_bkg_tiles( 0, 0, 20, 18, level2Map); //load background map
-        //set_bkg_data(0, level2_tile_count, level2_tile_data ); //load background tile set
-        //set_bkg_tiles( 0, 0, level2_tile_map_width, level2_tile_map_height, level2_map_data); //load background map
-        platform1_state[OBJECT_X] = 0;
-        platform1_state[OBJECT_Y] = 120;
-        platform1_state[OBJECT_W] = 23;
-        platform1_state[OBJECT_H] = 24;
+        set_bkg_data(0, 19, levelTiles ); //load background tile set
+        set_bkg_tiles( 0, 0, 20, 18, level2Map); //load background map
+        platform1_state[OBJECT_X] = 8;
+        platform1_state[OBJECT_Y] = 112;
+        platform1_state[OBJECT_W] = 16;
+        platform1_state[OBJECT_H] = 16;
         platform1_state[OBJECT_DIR] = 0;
         platform1_state[OBJECT_TILE] = 0;
 
         platform2_state[OBJECT_X] = 40;
-        platform2_state[OBJECT_Y] = 120;
-        platform2_state[OBJECT_W] = 79;
-        platform2_state[OBJECT_H] = 15;
+        platform2_state[OBJECT_Y] = 112;
+        platform2_state[OBJECT_W] = 72;
+        platform2_state[OBJECT_H] = 16;
         platform2_state[OBJECT_DIR] = 0;
         platform2_state[OBJECT_TILE] = 0;
 
-        platform3_state[OBJECT_X] = 136;
-        platform3_state[OBJECT_Y] = 120;
-        platform3_state[OBJECT_W] = 15;
-        platform3_state[OBJECT_H] = 15;
+        platform3_state[OBJECT_X] = 56;
+        platform3_state[OBJECT_Y] = 104;
+        platform3_state[OBJECT_W] = 48;
+        platform3_state[OBJECT_H] = 8;
         platform3_state[OBJECT_DIR] = 0;
         platform3_state[OBJECT_TILE] = 0;
 
-        platform4_state[OBJECT_X] = 0;
-        platform4_state[OBJECT_Y] = 0;
-        platform4_state[OBJECT_W] = 0;
-        platform4_state[OBJECT_H] = 0;
+        platform4_state[OBJECT_X] = 136;
+        platform4_state[OBJECT_Y] = 112;
+        platform4_state[OBJECT_W] = 16;
+        platform4_state[OBJECT_H] = 16;
         platform4_state[OBJECT_DIR] = 0;
         platform4_state[OBJECT_TILE] = 0;
 
@@ -346,33 +372,33 @@ void setupLevel(UINT8 level){
         platform5_state[OBJECT_DIR] = 0;
         platform5_state[OBJECT_TILE] = 0;
     } else if (level == 3){
-        //set_bkg_data(0, level3_tile_count, level3_tile_data ); //load background tile set
-        //set_bkg_tiles( 0, 0, level3_tile_map_width, level3_tile_map_height, level3_map_data); //load background map
-        platform1_state[OBJECT_X] = 0;
-        platform1_state[OBJECT_Y] = 120;
-        platform1_state[OBJECT_W] = 160;
-        platform1_state[OBJECT_H] = 24;
+        set_bkg_data(0, 19, levelTiles ); //load background tile set
+        set_bkg_tiles( 0, 0, 20, 18, level3Map); //load background map
+        platform1_state[OBJECT_X] = 8;
+        platform1_state[OBJECT_Y] = 112;
+        platform1_state[OBJECT_W] = 16;
+        platform1_state[OBJECT_H] = 16;
         platform1_state[OBJECT_DIR] = 0;
         platform1_state[OBJECT_TILE] = 0;
 
-        platform2_state[OBJECT_X] = 0;
-        platform2_state[OBJECT_Y] = 0;
-        platform2_state[OBJECT_W] = 0;
-        platform2_state[OBJECT_H] = 0;
+        platform2_state[OBJECT_X] = 40;
+        platform2_state[OBJECT_Y] = 96;
+        platform2_state[OBJECT_W] = 16;
+        platform2_state[OBJECT_H] = 16;
         platform2_state[OBJECT_DIR] = 0;
         platform2_state[OBJECT_TILE] = 0;
 
-        platform3_state[OBJECT_X] = 0;
-        platform3_state[OBJECT_Y] = 0;
-        platform3_state[OBJECT_W] = 0;
-        platform3_state[OBJECT_H] = 0;
+        platform3_state[OBJECT_X] = 88;
+        platform3_state[OBJECT_Y] = 96;
+        platform3_state[OBJECT_W] = 16;
+        platform3_state[OBJECT_H] = 16;
         platform3_state[OBJECT_DIR] = 0;
         platform3_state[OBJECT_TILE] = 0;
 
-        platform4_state[OBJECT_X] = 0;
-        platform4_state[OBJECT_Y] = 0;
-        platform4_state[OBJECT_W] = 0;
-        platform4_state[OBJECT_H] = 0;
+        platform4_state[OBJECT_X] = 136;
+        platform4_state[OBJECT_Y] = 112;
+        platform4_state[OBJECT_W] = 16;
+        platform4_state[OBJECT_H] = 16;
         platform4_state[OBJECT_DIR] = 0;
         platform4_state[OBJECT_TILE] = 0;
 
@@ -383,82 +409,82 @@ void setupLevel(UINT8 level){
         platform5_state[OBJECT_DIR] = 0;
         platform5_state[OBJECT_TILE] = 0;
     } else if (level == 4){
-        //set_bkg_data(0, level4_tile_count, level4_tile_data ); //load background tile set
-        //set_bkg_tiles( 0, 0, level4_tile_map_width, level4_tile_map_height, level4_map_data); //load background map
-        platform1_state[OBJECT_X] = 0;
-        platform1_state[OBJECT_Y] = 120;
-        platform1_state[OBJECT_W] = 160;
-        platform1_state[OBJECT_H] = 24;
+        set_bkg_data(0, 19, levelTiles ); //load background tile set
+        set_bkg_tiles( 0, 0, 20, 18, level4Map); //load background map
+        platform1_state[OBJECT_X] = 8;
+        platform1_state[OBJECT_Y] = 112;
+        platform1_state[OBJECT_W] = 16;
+        platform1_state[OBJECT_H] = 16;
         platform1_state[OBJECT_DIR] = 0;
         platform1_state[OBJECT_TILE] = 0;
 
-        platform2_state[OBJECT_X] = 0;
-        platform2_state[OBJECT_Y] = 0;
-        platform2_state[OBJECT_W] = 0;
-        platform2_state[OBJECT_H] = 0;
+        platform2_state[OBJECT_X] = 40;
+        platform2_state[OBJECT_Y] = 96;
+        platform2_state[OBJECT_W] = 16;
+        platform2_state[OBJECT_H] = 16;
         platform2_state[OBJECT_DIR] = 0;
         platform2_state[OBJECT_TILE] = 0;
 
-        platform3_state[OBJECT_X] = 0;
-        platform3_state[OBJECT_Y] = 0;
-        platform3_state[OBJECT_W] = 0;
-        platform3_state[OBJECT_H] = 0;
+        platform3_state[OBJECT_X] = 8;
+        platform3_state[OBJECT_Y] = 64;
+        platform3_state[OBJECT_W] = 16;
+        platform3_state[OBJECT_H] = 16;
         platform3_state[OBJECT_DIR] = 0;
         platform3_state[OBJECT_TILE] = 0;
 
-        platform4_state[OBJECT_X] = 0;
-        platform4_state[OBJECT_Y] = 0;
-        platform4_state[OBJECT_W] = 0;
-        platform4_state[OBJECT_H] = 0;
+        platform4_state[OBJECT_X] = 136;
+        platform4_state[OBJECT_Y] = 120;
+        platform4_state[OBJECT_W] = 16;
+        platform4_state[OBJECT_H] = 16;
         platform4_state[OBJECT_DIR] = 0;
         platform4_state[OBJECT_TILE] = 0;
 
-        platform5_state[OBJECT_X] = 0;
-        platform5_state[OBJECT_Y] = 0;
-        platform5_state[OBJECT_W] = 0;
-        platform5_state[OBJECT_H] = 0;
+        platform5_state[OBJECT_X] = 136;
+        platform5_state[OBJECT_Y] = 16;
+        platform5_state[OBJECT_W] = 16;
+        platform5_state[OBJECT_H] = 16;
         platform5_state[OBJECT_DIR] = 0;
         platform5_state[OBJECT_TILE] = 0;
     } else if (level == 5){
-        //set_bkg_data(0, level5_tile_count, level5_tile_data ); //load background tile set
-        //set_bkg_tiles( 0, 0, level5_tile_map_width, level5_tile_map_height, level5_map_data); //load background map
-        platform1_state[OBJECT_X] = 0;
-        platform1_state[OBJECT_Y] = 120;
-        platform1_state[OBJECT_W] = 160;
-        platform1_state[OBJECT_H] = 24;
+        set_bkg_data(0, 19, levelTiles ); //load background tile set
+        set_bkg_tiles( 0, 0, 20, 18, level5Map); //load background map
+        platform1_state[OBJECT_X] = 136;
+        platform1_state[OBJECT_Y] = 112;
+        platform1_state[OBJECT_W] = 16;
+        platform1_state[OBJECT_H] = 16;
         platform1_state[OBJECT_DIR] = 0;
         platform1_state[OBJECT_TILE] = 0;
 
-        platform2_state[OBJECT_X] = 0;
-        platform2_state[OBJECT_Y] = 0;
-        platform2_state[OBJECT_W] = 0;
-        platform2_state[OBJECT_H] = 0;
+        platform2_state[OBJECT_X] = 104;
+        platform2_state[OBJECT_Y] = 112;
+        platform2_state[OBJECT_W] = 16;
+        platform2_state[OBJECT_H] = 32;
         platform2_state[OBJECT_DIR] = 0;
         platform2_state[OBJECT_TILE] = 0;
 
-        platform3_state[OBJECT_X] = 0;
-        platform3_state[OBJECT_Y] = 0;
-        platform3_state[OBJECT_W] = 0;
-        platform3_state[OBJECT_H] = 0;
+        platform3_state[OBJECT_X] = 88;
+        platform3_state[OBJECT_Y] = 64;
+        platform3_state[OBJECT_W] = 16;
+        platform3_state[OBJECT_H] = 80;
         platform3_state[OBJECT_DIR] = 0;
         platform3_state[OBJECT_TILE] = 0;
 
-        platform4_state[OBJECT_X] = 0;
+        platform4_state[OBJECT_X] = 40;
         platform4_state[OBJECT_Y] = 0;
-        platform4_state[OBJECT_W] = 0;
-        platform4_state[OBJECT_H] = 0;
+        platform4_state[OBJECT_W] = 16;
+        platform4_state[OBJECT_H] = 88;
         platform4_state[OBJECT_DIR] = 0;
         platform4_state[OBJECT_TILE] = 0;
 
-        platform5_state[OBJECT_X] = 0;
-        platform5_state[OBJECT_Y] = 0;
-        platform5_state[OBJECT_W] = 0;
-        platform5_state[OBJECT_H] = 0;
+        platform5_state[OBJECT_X] = 8;
+        platform5_state[OBJECT_Y] = 48;
+        platform5_state[OBJECT_W] = 16;
+        platform5_state[OBJECT_H] = 16;
         platform5_state[OBJECT_DIR] = 0;
         platform5_state[OBJECT_TILE] = 0;
     } else if (level == 6){
-        //set_bkg_data(0, level6_tile_count, level6_tile_data ); //load background tile set
-        //set_bkg_tiles( 0, 0, level6_tile_map_width, level6_tile_map_height, level6_map_data); //load background map
+        set_bkg_data(0, 19, levelTiles ); //load background tile set
+        //set_bkg_tiles( 0, 0, 20, 18, level6Map); //load background map
         platform1_state[OBJECT_X] = 0;
         platform1_state[OBJECT_Y] = 120;
         platform1_state[OBJECT_W] = 160;
@@ -539,14 +565,35 @@ void transition(UINT8 next_level){
         }
         player_attack_count++;
         PlayerState(player_state[OBJECT_X],player_state[OBJECT_Y],player_state[OBJECT_DIR],player_state[OBJECT_TILE]);
+        BackgroundState(player_state[OBJECT_TILE]);
         wait_vbl_done();
     }
+
     player_state[OBJECT_TILE] = 10; //set player type to attack frame 4
     PlayerState(player_state[OBJECT_X],player_state[OBJECT_Y],player_state[OBJECT_DIR],player_state[OBJECT_TILE]);
+    BackgroundState(player_state[OBJECT_TILE]);
+    set_bkg_palette(0, 1, bkgPalette_blank); //keep background hidden
     wait_vbl_done();
     setupLevel(next_level);
-    for(UINT8 i = player_state[OBJECT_X]; i > 2; i-=1){
-        player_state[OBJECT_X] = i;
+    UINT8 level_start_x = level_start_xs[next_level-1];
+    UINT8 level_start_y = level_start_ys[next_level-1];
+    UINT8 reached_x = 0;
+    UINT8 reached_y = 0;
+    while(reached_x == 0 || reached_y == 0){
+        if (player_state[OBJECT_X] > level_start_x){
+            player_state[OBJECT_X] = player_state[OBJECT_X] - 1;
+        } else if (player_state[OBJECT_X] < level_start_x){
+            player_state[OBJECT_X] = player_state[OBJECT_X] + 1;
+        } else {
+            reached_x = 1;
+        }
+        if (player_state[OBJECT_Y] > level_start_y){
+            player_state[OBJECT_Y] = player_state[OBJECT_Y] - 1;
+        } else if (player_state[OBJECT_Y] < level_start_y){
+            player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
+        } else {
+            reached_y = 1;
+        }
         PlayerState(player_state[OBJECT_X],player_state[OBJECT_Y],player_state[OBJECT_DIR],player_state[OBJECT_TILE]);
         set_bkg_palette(0, 1, bkgPalette_blank); //keep background hidden
         wait_vbl_done();
@@ -555,28 +602,35 @@ void transition(UINT8 next_level){
 
 void checkLevelComplete(){
     if (level_num == 1){
-        if(keyPressed(J_A)){
+        if(keyPressed(J_B)){ //power pressed
             new_level = 1;
         }
     } else if (level_num == 2){
         test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
-        if (collisionStateCheck(test_player_state,platform3_state)){
+        if (collisionStateCheck(test_player_state,platform4_state)){ //on last platform
             new_level = 1;
-            /*
-            if (player_state[OBJECT_X] > platform3_state[OBJECT_X]){
-                if (player_state[OBJECT_Y] < platform3_state[OBJECT_Y]){
-                    new_level = 1;
-                }
-            }
-            */
         }
-        
+    } else if (level_num == 3){
+        test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
+        if (collisionStateCheck(test_player_state,platform4_state)){ //on last platform
+            new_level = 1;
+        }
+    } else if (level_num == 4){
+        test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
+        if (collisionStateCheck(test_player_state,platform5_state)){ //on last platform
+            new_level = 1;
+        }
+    }else if (level_num == 5){
+        test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
+        if (collisionStateCheck(test_player_state,platform5_state)){ //on last platform
+            new_level = 1;
+        }
     }
 }
 
 void main() {
-    player_state[OBJECT_X] = 2;
-    player_state[OBJECT_Y] = 104;
+    player_state[OBJECT_X] = level_start_xs[0];
+    player_state[OBJECT_Y] = level_start_ys[0];
     player_state[OBJECT_W] = 8;
     player_state[OBJECT_H] = 16;
     player_state[OBJECT_DIR] = 0;
@@ -601,6 +655,10 @@ void main() {
     player_is_attacking = 0;
     player_walk_index = 0;
 
+    DISPLAY_ON;
+
+    HIDE_WIN;
+
     // load backgrounds
     set_bkg_palette(0, 1, bkgPalette_blank);
     setupLevel(1);
@@ -613,16 +671,11 @@ void main() {
     SPRITES_8x16;
     PlayerInit();
     PlayerState(player_state[OBJECT_X],player_state[OBJECT_Y],player_state[OBJECT_DIR],player_state[OBJECT_TILE]);
+    BackgroundState(player_state[OBJECT_TILE]);
     SHOW_SPRITES; // display sprites
 
     // game loop
     while(1) {
-        if (new_level == 1){
-            transition(level_num+1);
-            level_num++;
-            new_level = 0;
-        }
-
         player_move_x = 0;
         player_move_y = 0;
 
@@ -634,7 +687,7 @@ void main() {
             player_is_walking = 0;
         }
 
-        if(keyPressed(J_A)) {
+        if(keyPressed(J_B)) {
             //attack
             player_attack_count++;
             if (player_attack_count < 50){
@@ -664,7 +717,7 @@ void main() {
                 }
             }
 
-            if(keyPressed(J_UP)) {
+            if(keyPressed(J_A)) {
                 //jump
                 player_jump_count++;
                 if (player_jump_count < 50){ // restrict jump time
@@ -769,13 +822,7 @@ void main() {
         }
 
         PlayerState(player_state[OBJECT_X],player_state[OBJECT_Y],player_state[OBJECT_DIR],player_state[OBJECT_TILE]);
-
-        prev_player_state[OBJECT_X] = player_state[OBJECT_X];
-        prev_player_state[OBJECT_Y] = player_state[OBJECT_Y];
-        prev_player_state[OBJECT_W] = player_state[OBJECT_W];
-        prev_player_state[OBJECT_H] = player_state[OBJECT_H];
-        prev_player_state[OBJECT_DIR] = player_state[OBJECT_DIR];
-        prev_player_state[OBJECT_TILE] = player_state[OBJECT_TILE];
+        BackgroundState(player_state[OBJECT_TILE]);
 
         test_player_state[OBJECT_X] = player_state[OBJECT_X];
         test_player_state[OBJECT_Y] = player_state[OBJECT_Y];
@@ -785,5 +832,24 @@ void main() {
         test_player_state[OBJECT_TILE] = player_state[OBJECT_TILE];
 
         checkLevelComplete();
+
+        if (new_level == 1){
+            level_num++;
+            if (level_num > 5){
+                level_num = 1;
+            }
+            transition(level_num);
+            //setupLevel(level_num);
+            //player_state[OBJECT_X] = level_start_xs[level_num-1];
+            //player_state[OBJECT_Y] = level_start_ys[level_num-1];
+            new_level = 0;
+        }
+
+        prev_player_state[OBJECT_X] = player_state[OBJECT_X];
+        prev_player_state[OBJECT_Y] = player_state[OBJECT_Y];
+        prev_player_state[OBJECT_W] = player_state[OBJECT_W];
+        prev_player_state[OBJECT_H] = player_state[OBJECT_H];
+        prev_player_state[OBJECT_DIR] = player_state[OBJECT_DIR];
+        prev_player_state[OBJECT_TILE] = player_state[OBJECT_TILE];
     }
 }
