@@ -10,6 +10,8 @@
 #include "level3Map.c"
 #include "level4Map.c"
 #include "level5Map.c"
+#include "level6Map.c"
+#include "levelEndMap.c"
 
 #define BLANK_SPRITE_INDEX 0
 
@@ -37,8 +39,13 @@ UINT8 effect1_state[6] = {0, 0, 0, 0, 0, 0}; //X,Y,W,H,DIR,TILE (DEATH EFFECT)
 
 UINT8 background_type;
 
-UINT8 level_start_xs[5] = {72,8,8,8,136};
-UINT8 level_start_ys[5] = {96,96,96,96,96};
+UINT8 level_start_xs[7] = {72,8,8,8,136,8,76};
+UINT8 level_start_ys[7] = {96,96,96,96,96,96,88};
+
+UINT8 time_in_air;
+UINT8 time_boosting;
+
+UINT8 checkpoint_level;
 
 UINT8 player_move_x;
 UINT8 player_move_y;
@@ -67,16 +74,12 @@ UINT8 player_is_jumping;
 UINT8 player_walk_index;
 UINT8 bkg_x, bkg_y;
 
-UWORD bkgPalette_normal[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
-UWORD bkgPalette_blank[] = { RGB(0,7,5), RGB(0,7,5), RGB(0,7,5), RGB(0,7,5)};
-UWORD bkgPalette_fade1[] = { RGB(7,23,8), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
-UWORD bkgPalette_fade2[] = { RGB(4,14,6), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
-/*
-UWORD bkgPalette_normal[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
-UWORD bkgPalette_blank[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
-UWORD bkgPalette_fade1[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
-UWORD bkgPalette_fade2[] = { RGB(28,29,5), RGB(7,23,8), RGB(4,14,6), RGB(0,7,5)};
-*/
+UWORD spritePalette[] = {RGB(0,0,0), RGB(9,31,27), RGB(2,19,31), RGB(31,31,31)};
+
+UWORD bkgPalette_normal[] = { spritePalette[3], spritePalette[1], spritePalette[2], spritePalette[0]};
+UWORD bkgPalette_blank[] = { spritePalette[0], spritePalette[0], spritePalette[0], spritePalette[0]};
+UWORD bkgPalette_fade1[] = { spritePalette[1], spritePalette[1], spritePalette[2], spritePalette[0]};
+UWORD bkgPalette_fade2[] = { spritePalette[2], spritePalette[1], spritePalette[2], spritePalette[0]};
 
 UBYTE previous_KEYS = 0;
 UBYTE keys = 0;
@@ -132,18 +135,6 @@ UINT8 collisionCheck(UINT8 x1, UINT8 y1, UINT8 w1, UINT8 h1, UINT8 x2, UINT8 y2,
 	}
 }
 
-UINT8 collisionCheckDir(UINT8 x1, UINT8 y1, UINT8 w1, UINT8 h1, UINT8 x2, UINT8 y2, UINT8 w2, UINT8 h2) {
-	if ((x1 < (x2+w2)) && ((x1+w1) > x2) && (y1 < (h2+y2)) && ((y1+h1) > y2)) {
-		
-		return 1;
-	
-	} else {
-		
-		return 0;
-	
-	}
-}
-
 UINT8 collisionStateCheck(UINT8 stateA[6], UINT8 stateB[6]){
     return collisionCheck(
         stateA[OBJECT_X],stateA[OBJECT_Y],stateA[OBJECT_W],stateA[OBJECT_H],
@@ -166,8 +157,6 @@ void PlayerInit(){
     set_sprite_data(0, 52, playerTiles);
     set_sprite_tile(0, 4);
     set_sprite_tile(1, 8);
-
-    UWORD spritePalette[] = {0, RGB(7,23,8), RGB(4,14,6), RGB(28,29,5)};
 
     set_sprite_palette(0, 1, spritePalette);
 }
@@ -566,7 +555,7 @@ void setupLevel(UINT8 level){
         platform4_state[OBJECT_H] = 16;
 
         platform5_state[OBJECT_X] = 136;
-        platform5_state[OBJECT_Y] = 16;
+        platform5_state[OBJECT_Y] = 32;
         platform5_state[OBJECT_W] = 16;
         platform5_state[OBJECT_H] = 16;
 
@@ -636,11 +625,56 @@ void setupLevel(UINT8 level){
 
     } else if (level == 6){
         set_bkg_data(0, 19, levelTiles ); //load background tile set
-        //set_bkg_tiles( 0, 0, 20, 18, level6Map); //load background map
-        platform1_state[OBJECT_X] = 0;
+        set_bkg_tiles( 0, 0, 20, 18, level6Map); //load background map
+        platform1_state[OBJECT_X] = 8;
         platform1_state[OBJECT_Y] = 120;
-        platform1_state[OBJECT_W] = 160;
-        platform1_state[OBJECT_H] = 24;
+        platform1_state[OBJECT_W] = 24;
+        platform1_state[OBJECT_H] = 16;
+
+        platform2_state[OBJECT_X] = 32;
+        platform2_state[OBJECT_Y] = 32;
+        platform2_state[OBJECT_W] = 24;
+        platform2_state[OBJECT_H] = 112;
+
+        platform3_state[OBJECT_X] = 80;
+        platform3_state[OBJECT_Y] = 0;
+        platform3_state[OBJECT_W] = 24;
+        platform3_state[OBJECT_H] = 112;
+
+        platform4_state[OBJECT_X] = 128;
+        platform4_state[OBJECT_Y] = 48;
+        platform4_state[OBJECT_W] = 24;
+        platform4_state[OBJECT_H] = 16;
+
+        platform5_state[OBJECT_X] = 0;
+        platform5_state[OBJECT_Y] = 0;
+        platform5_state[OBJECT_W] = 0;
+        platform5_state[OBJECT_H] = 0;
+
+        powerup1_state[OBJECT_X] = 160;
+        powerup1_state[OBJECT_Y] = 144;
+        powerup1_state[OBJECT_W] = 0;
+        powerup1_state[OBJECT_H] = 0;
+        powerup1_state[OBJECT_TILE] = 0;
+
+        powerup2_state[OBJECT_X] = 160;
+        powerup2_state[OBJECT_Y] = 144;
+        powerup2_state[OBJECT_W] = 0;
+        powerup2_state[OBJECT_H] = 0;
+        powerup2_state[OBJECT_TILE] = 0;
+
+        powerup3_state[OBJECT_X] = 16;
+        powerup3_state[OBJECT_Y] = 104;
+        powerup3_state[OBJECT_W] = 16;
+        powerup3_state[OBJECT_H] = 16;
+        powerup3_state[OBJECT_TILE] = 0;
+    } else if (level == 7){
+        set_bkg_data(0, 19, levelTiles ); //load background tile set
+        set_bkg_tiles( 0, 0, 20, 18, levelEndMap); //load background map
+        platform1_state[OBJECT_X] = 72;
+        platform1_state[OBJECT_Y] = 96;
+        platform1_state[OBJECT_W] = 16;
+        platform1_state[OBJECT_H] = 16;
 
         platform2_state[OBJECT_X] = 0;
         platform2_state[OBJECT_Y] = 0;
@@ -679,7 +713,6 @@ void setupLevel(UINT8 level){
         powerup3_state[OBJECT_W] = 0;
         powerup3_state[OBJECT_H] = 0;
         powerup3_state[OBJECT_TILE] = 0;
-
     }
 }
 
@@ -824,21 +857,11 @@ void transition(UINT8 next_level){
 }
 
 void checkSceneCollisons(){
-    if (resetFromCollision(prev_player_state, player_state, platform1_state)){
-        player_is_on_floor = 1;
-    }
-    if (resetFromCollision(prev_player_state, player_state, platform2_state)){
-        player_is_on_floor = 1;
-    }
-    if (resetFromCollision(prev_player_state, player_state, platform3_state)){
-        player_is_on_floor = 1;
-    }
-    if (resetFromCollision(prev_player_state, player_state, platform4_state)){
-        player_is_on_floor = 1;
-    }
-    if (resetFromCollision(prev_player_state, player_state, platform5_state)){
-        player_is_on_floor = 1;
-    }
+    resetFromCollision(prev_player_state, player_state, platform1_state);
+    resetFromCollision(prev_player_state, player_state, platform2_state);
+    resetFromCollision(prev_player_state, player_state, platform3_state);
+    resetFromCollision(prev_player_state, player_state, platform4_state);
+    resetFromCollision(prev_player_state, player_state, platform5_state);
 
     // make sure player doesn't go outside screen
     if (player_state[OBJECT_Y] <= 0 || player_state[OBJECT_Y] > 200){
@@ -886,18 +909,27 @@ void checkLevelComplete(){
         if (collisionStateCheck(test_player_state,platform5_state)){ //on last platform
             new_level = 1;
         }
+    }else if (level_num == 6){
+        test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
+        if (collisionStateCheck(test_player_state,platform4_state)){ //on last platform
+            new_level = 1;
+        }
+    }else if (level_num == 7){
+        //TODO add ending effects, delay restart for a few seconds
+        test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
+        if (collisionStateCheck(test_player_state,platform1_state)){ //on last platform
+            new_level = 1;
+        }
     }
 }
 
 void Death(){
-    // reset to level 1
-    level_num = 1;
+    // reset to last checkpoint level
+    level_num = checkpoint_level;
     // hide player
     player_state[OBJECT_TILE] = 0;
     effect1_state[OBJECT_X] = player_state[OBJECT_X];
     effect1_state[OBJECT_Y] = 127;
-    //effect1_state[OBJECT_X] = 50;
-    //effect1_state[OBJECT_Y] = 50;
 
     while (1){
         wait_vbl_done();
@@ -976,6 +1008,11 @@ void main() {
     player_walk_index = 0;
     player_is_dead = 0;
 
+    checkpoint_level = 1;
+
+    time_in_air = 0;
+    time_boosting = 0;
+
     DISPLAY_ON;
 
     HIDE_WIN;
@@ -1043,75 +1080,87 @@ void main() {
             }
 
             if (player_powerup == 0){ //normal jump
-                if(keyPressed(J_A)) {
-                    //jump
-                    player_jump_count++;
-                    if (player_jump_count < 25){ // restrict jump time
-                        // accelleration arch to jump
-                        if (player_jump_count < 3){
-                            player_move_y-=1;
-                        } else if (player_jump_count < 5){
-                            player_move_y-=2;
-                        } else if (player_jump_count < 10){
-                            player_move_y-=3;
-                        } else if (player_jump_count < 15){
-                            player_move_y-=2;
-                        } else if (player_jump_count < 20){
-                            player_move_y-=1; //gravity is -1 so total movement is net 0
+                if (time_boosting < 25){
+                    if(keyPressed(J_A)) {
+                        time_boosting++;
+                        //jump
+                        player_jump_count++;
+                        if (player_jump_count < 25){ // restrict jump time
+                            // accelleration arch to jump
+                            if (player_jump_count < 3){
+                                player_move_y-=1;
+                            } else if (player_jump_count < 5){
+                                player_move_y-=2;
+                            } else if (player_jump_count < 10){
+                                player_move_y-=3;
+                            } else if (player_jump_count < 15){
+                                player_move_y-=2;
+                            } else if (player_jump_count < 20){
+                                player_move_y-=1; //gravity is -1 so total movement is net 0
+                            }
+                            player_is_jumping = 1;
+                        } else {
+                            player_jump_count = 25;
+                            player_is_jumping = 0;
                         }
-                        player_is_jumping = 1;
                     } else {
-                        player_jump_count = 25;
                         player_is_jumping = 0;
+                        player_jump_count = 0;
                     }
-                } else {
-                    player_is_jumping = 0;
-                    player_jump_count = 0;
                 }
             } else if (player_powerup == 1){ //small boost jump
-                if(keyPressed(J_A)) {
-                    //jump
-                    player_jump_count++;
-                    if (player_jump_count < 20){ // restrict jump time
-                        player_move_y-=3;
-                        player_is_jumping = 1;
+                if (time_boosting < 30){
+                    if(keyPressed(J_A)) {
+                        time_boosting++;
+                        //jump
+                        player_jump_count++;
+                        if (player_jump_count < 20){ // restrict jump time
+                            player_move_y-=3;
+                            player_is_jumping = 1;
+                        } else {
+                            player_jump_count = 20;
+                            player_is_jumping = 0;
+                        }
                     } else {
-                        player_jump_count = 20;
                         player_is_jumping = 0;
+                        player_jump_count = 0;
                     }
-                } else {
-                    player_is_jumping = 0;
-                    player_jump_count = 0;
                 }
             } else if (player_powerup == 2){ // medium boost jump
-                if(keyPressed(J_A)) {
-                    //jump
-                    player_jump_count++;
-                    if (player_jump_count < 30){ // restrict jump time
-                        player_move_y-=3;
-                        player_is_jumping = 1;
+                if (time_boosting < 50){
+                    if(keyPressed(J_A)) {
+                        time_boosting++;
+                        //jump
+                        player_jump_count++;
+                        if (player_jump_count < 30){ // restrict jump time
+                            player_move_y-=3;
+                            player_is_jumping = 1;
+                        } else {
+                            player_jump_count = 30;
+                            player_is_jumping = 0;
+                        }
                     } else {
-                        player_jump_count = 30;
                         player_is_jumping = 0;
+                        player_jump_count = 0;
                     }
-                } else {
-                    player_is_jumping = 0;
-                    player_jump_count = 0;
                 }
             } else if (player_powerup == 3){ // large boost jump
-                if(keyPressed(J_A)) {
-                    //jump
-                    player_jump_count++;
-                    if (player_jump_count < 50){ // restrict jump time
-                        player_move_y-=3;
-                        player_is_jumping = 1;
+                if (time_boosting < 80){
+                    if(keyPressed(J_A)) {
+                        time_boosting++;
+                        //jump
+                        player_jump_count++;
+                        if (player_jump_count < 50){ // restrict jump time
+                            player_move_y-=3;
+                            player_is_jumping = 1;
+                        } else {
+                            player_jump_count = 50;
+                            player_is_jumping = 0;
+                        }
                     } else {
-                        player_jump_count = 50;
                         player_is_jumping = 0;
+                        player_jump_count = 0;
                     }
-                } else {
-                    player_is_jumping = 0;
-                    player_jump_count = 0;
                 }
             }
             
@@ -1127,8 +1176,6 @@ void main() {
         //move x
         player_state[OBJECT_X] = player_state[OBJECT_X] + player_move_x;
 
-        player_is_on_floor = 0;
-
         //check collision
         checkSceneCollisons();
 
@@ -1141,7 +1188,29 @@ void main() {
         // check collision
         checkSceneCollisons();
 
+        test_player_state[OBJECT_X] = player_state[OBJECT_X];
+        test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
+        test_player_state[OBJECT_W] = player_state[OBJECT_W];
+        test_player_state[OBJECT_H] = player_state[OBJECT_H];
+        test_player_state[OBJECT_DIR] = player_state[OBJECT_DIR];
+        test_player_state[OBJECT_TILE] = player_state[OBJECT_TILE];
+
+        if (collisionStateCheck(test_player_state,platform1_state)){
+            player_is_on_floor = 1;
+        } else if (collisionStateCheck(test_player_state,platform2_state)){
+            player_is_on_floor = 1;
+        } else if (collisionStateCheck(test_player_state,platform3_state)){
+            player_is_on_floor = 1;
+        } else if (collisionStateCheck(test_player_state,platform4_state)){
+            player_is_on_floor = 1;
+        } else if (collisionStateCheck(test_player_state,platform5_state)){
+            player_is_on_floor = 1;
+        } else {
+            player_is_on_floor = 0;
+        }
+
         if (player_is_on_floor == 0){
+            time_in_air++;
             background_type = 0;
             if (player_powerup == 0){
                 if (player_is_jumping == 1){
@@ -1157,19 +1226,21 @@ void main() {
                 }
             }
         } else {
+            time_in_air = 0;
+            time_boosting = 0;
             if (player_is_attacking == 1){
                 PlayerAttackAnim(10);
             }
             else if (player_is_walking == 1){
                 if (player_walk_count > 10){
                     if (player_walk_index == 0){
-                        player_state[OBJECT_TILE] = 2; //set player type to walk frame 1
+                        player_state[OBJECT_TILE] = 4; //set player type to walk frame 2
                     } else if (player_walk_index == 1) {
-                        player_state[OBJECT_TILE] = 3; //set player type to walk frame 2
+                        player_state[OBJECT_TILE] = 1; //set player type to walk frame 3
                     } else if (player_walk_index == 2){
-                        player_state[OBJECT_TILE] = 4; //set player type to walk frame 3
+                        player_state[OBJECT_TILE] = 2; //set player type to normal frame
                     } else if (player_walk_index == 3){
-                        player_state[OBJECT_TILE] = 1; //set player type to normal frame
+                        player_state[OBJECT_TILE] = 3; //set player type to walk frame 1
                     }
                     player_walk_index++;
                     if (player_walk_index > 3){
@@ -1179,7 +1250,7 @@ void main() {
                 }
                 player_walk_count++;
             } else {
-                player_walk_count = 0;
+                player_walk_count = 11;
                 player_state[OBJECT_TILE] = 1;
                 background_type = 0;
             }
@@ -1204,7 +1275,7 @@ void main() {
         if (new_level == 1){
             player_powerup = 0;
             level_num++;
-            if (level_num > 5){
+            if (level_num > 7){
                 level_num = 1;
             }
             player_attack_frame_index = 0;
@@ -1218,10 +1289,35 @@ void main() {
                 UpdateBackground();
                 if (attack_anim_complete == 1){
                     attack_anim_complete = 0;
-                    player_attack_frame_index = 0;
                     break;
                 }
             }
+            if (level_num == 2){ // transition from title to level 2
+                for (UINT8 i = 0; i < 120; i++){
+                    //Hold title animation for longer
+                    wait_vbl_done();
+                    updateKeys();
+                    PlayerAttackAnim(5);
+                    UpdatePlayer();
+                    UpdatePowerups();
+                    UpdateBackground();
+                }
+            } else if (level_num == 5){
+                checkpoint_level = 5;
+            } else if (level_num == 1){ // transition from end screen to title
+                checkpoint_level = 1;
+                for (UINT8 i = 0; i < 150; i++){
+                    //Hold title animation for longer
+                    //TODO add end title effects
+                    wait_vbl_done();
+                    updateKeys();
+                    PlayerAttackAnim(5);
+                    UpdatePlayer();
+                    UpdatePowerups();
+                    UpdateBackground();
+                }
+            }
+            player_attack_frame_index = 0;
             //set player type to attack frame 4
             player_state[OBJECT_TILE] = 10; 
             transition(level_num);
