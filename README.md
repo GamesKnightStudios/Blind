@@ -1,12 +1,16 @@
-# Space
-SPACE, a game by Games Knight Studios.
+# Blind
+![Blind title screen](/docs/blind_title.png?raw=true)
+
+BLIND, by Games Knight Studios.  
+Created as part of GBJam8 on itch.io
 
 # Latest release
-Available on [itch.io](https://itch.io/jam/space)
+Get the latest release on [itch.io](https://itch.io/jam/blind)
 
 # Developer Zone
+The full source code for this game is avaiable as OpenSource. Instructions for building from source are provided below.
 
-## Additional packages
+## Useful packages
 The following packages were used to build this game:
  - [GameBoy Development Kit](https://github.com/Zal0/gbdk-2020/releases/latest) (Recommended: v3.2)
  - [BGB GameBoy Emulator](https://bgb.bircd.org/) (Recommended: v1.5.8)
