@@ -1131,6 +1131,7 @@ void main() {
                         if (player_jump_count < 20){ // restrict jump time
                             player_move_y-=3;
                             player_is_jumping = 1;
+                            PlayNote(C3_LR,C3_HR);
                         } else {
                             player_jump_count = 20;
                             player_is_jumping = 0;
