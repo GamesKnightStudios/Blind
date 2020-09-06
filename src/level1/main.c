@@ -12,6 +12,7 @@
 #include "level5Map.c"
 #include "level6Map.c"
 #include "levelEndMap.c"
+#include "music.c"
 
 #define BLANK_SPRITE_INDEX 0
 
@@ -72,7 +73,6 @@ UINT8 player_is_attacking;
 UINT8 player_is_on_floor;
 UINT8 player_is_jumping;
 UINT8 player_walk_index;
-UINT8 bkg_x, bkg_y;
 
 UWORD spritePalette[] = {RGB(0,0,0), RGB(9,31,27), RGB(2,19,31), RGB(31,31,31)};
 
@@ -154,7 +154,7 @@ UINT8 resetFromCollision(UINT8 prevstateA[6], UINT8 stateA[6], UINT8 stateB[6]){
 }
 
 void PlayerInit(){
-    set_sprite_data(0, 52, playerTiles);
+    set_sprite_data(0, 56, playerTiles);
     set_sprite_tile(0, 4);
     set_sprite_tile(1, 8);
 
@@ -253,6 +253,9 @@ void UpdatePlayer(){
     } else if (player_state[OBJECT_TILE] == 12){ //attack frame 6
         set_sprite_tile(0, 48);
         set_sprite_tile(1, 50);
+    } else if (player_state[OBJECT_TILE] == 13){ //jump frame 4
+        set_sprite_tile(0, 52);
+        set_sprite_tile(1, 54);
     }
 
     if (player_state[OBJECT_DIR] == 0){
@@ -274,9 +277,9 @@ void UpdatePlayer(){
 
 void EffectsInit(){
     // load death effect sprite data
-    set_sprite_data(66, 14, deathEffectTiles);
-    set_sprite_tile(8, 66);
-    set_sprite_tile(9, 68);
+    set_sprite_data(68, 14, deathEffectTiles);
+    set_sprite_tile(8, 68);
+    set_sprite_tile(9, 70);
 
     move_sprite(8, effect1_state[OBJECT_X] + 8, effect1_state[OBJECT_Y] + 16);
     move_sprite(9, effect1_state[OBJECT_X] + 16, effect1_state[OBJECT_Y] + 16);
@@ -287,26 +290,26 @@ void UpdateEffects(){
         set_sprite_tile(8, 0);
         set_sprite_tile(9, 2);
     } else if (effect1_state[OBJECT_TILE] == 1){ // animation frame 1
-        set_sprite_tile(8, 66);
-        set_sprite_tile(9, 68);
+        set_sprite_tile(8, 68);
+        set_sprite_tile(9, 70);
     } else if (effect1_state[OBJECT_TILE] == 2){ // animation frame 2
-        set_sprite_tile(8, 70);
-        set_sprite_tile(9, 72);
+        set_sprite_tile(8, 72);
+        set_sprite_tile(9, 74);
     } else if (effect1_state[OBJECT_TILE] == 3){ // animation frame 3
-        set_sprite_tile(8, 74);
-        set_sprite_tile(9, 76);
+        set_sprite_tile(8, 76);
+        set_sprite_tile(9, 78);
     } else if (effect1_state[OBJECT_TILE] == 4){ // animation frame 4
-        set_sprite_tile(8, 78);
-        set_sprite_tile(9, 80);
+        set_sprite_tile(8, 80);
+        set_sprite_tile(9, 82);
     } else if (effect1_state[OBJECT_TILE] == 5){ // animation frame 5
-        set_sprite_tile(8, 82);
-        set_sprite_tile(9, 84);
+        set_sprite_tile(8, 84);
+        set_sprite_tile(9, 86);
     } else if (effect1_state[OBJECT_TILE] == 6){ // animation frame 6
-        set_sprite_tile(8, 86);
-        set_sprite_tile(9, 88);
+        set_sprite_tile(8, 88);
+        set_sprite_tile(9, 90);
     } else if (effect1_state[OBJECT_TILE] == 7){ // animation frame 7
-        set_sprite_tile(8, 90);
-        set_sprite_tile(9, 92);
+        set_sprite_tile(8, 92);
+        set_sprite_tile(9, 94);
     }
 
     move_sprite(8, effect1_state[OBJECT_X] + 8, effect1_state[OBJECT_Y] + 16);
@@ -315,20 +318,14 @@ void UpdateEffects(){
 
 void PowerupsInit(){
     // load powerup sprite data
-    set_sprite_data(54, 12, powerupTiles);
-    set_sprite_tile(2, 54);
-    set_sprite_tile(3, 56);
-    set_sprite_tile(4, 58);
-    set_sprite_tile(5, 60);
-    set_sprite_tile(6, 62);
-    set_sprite_tile(7, 64);
+    set_sprite_data(56, 12, powerupTiles);
+    set_sprite_tile(2, 58);
+    set_sprite_tile(3, 62);
+    set_sprite_tile(4, 66);
 
-    move_sprite(2, powerup1_state[OBJECT_X] + 8, powerup1_state[OBJECT_Y] + 16);
-    move_sprite(3, powerup1_state[OBJECT_X] + 16, powerup1_state[OBJECT_Y] + 16);
-    move_sprite(4, powerup2_state[OBJECT_X] + 8, powerup2_state[OBJECT_Y] + 16);
-    move_sprite(5, powerup2_state[OBJECT_X] + 16, powerup2_state[OBJECT_Y] + 16);
-    move_sprite(6, powerup3_state[OBJECT_X] + 8, powerup3_state[OBJECT_Y] + 16);
-    move_sprite(7, powerup3_state[OBJECT_X] + 16, powerup3_state[OBJECT_Y] + 16);
+    move_sprite(2, powerup1_state[OBJECT_X] + 8, powerup1_state[OBJECT_Y] + 8);
+    move_sprite(3, powerup2_state[OBJECT_X] + 8, powerup2_state[OBJECT_Y] + 8);
+    move_sprite(4, powerup3_state[OBJECT_X] + 8, powerup3_state[OBJECT_Y] + 8);
 }
 
 void UpdatePowerups(){
@@ -337,57 +334,59 @@ void UpdatePowerups(){
     // tile 1: animation frame 1
 
     if (powerup1_state[OBJECT_TILE] == 0){ //hide
-        set_sprite_tile(2, 0);
-        set_sprite_tile(3, 2);
+        set_sprite_tile(2, 2);
     } else if (powerup1_state[OBJECT_TILE] == 1){ //normal
-        set_sprite_tile(2, 54);
-        set_sprite_tile(3, 56);
+        set_sprite_tile(2, 58);
     }
     if (powerup2_state[OBJECT_TILE] == 0){ //hide
-        set_sprite_tile(4, 0);
-        set_sprite_tile(5, 2);
+        set_sprite_tile(3, 2);
     } else if (powerup2_state[OBJECT_TILE] == 1){ //normal
-        set_sprite_tile(4, 58);
-        set_sprite_tile(5, 60);
+        set_sprite_tile(3, 62);
     }
     if (powerup3_state[OBJECT_TILE] == 0){ //hide
-        set_sprite_tile(6, 0);
-        set_sprite_tile(7, 2);
+        set_sprite_tile(4, 2);
     } else if (powerup3_state[OBJECT_TILE] == 1){ //normal
-        set_sprite_tile(6, 62);
-        set_sprite_tile(7, 64);
+        set_sprite_tile(4, 66);
     }
 
-    move_sprite(2, powerup1_state[OBJECT_X] + 8, powerup1_state[OBJECT_Y] + 16);
-    move_sprite(3, powerup1_state[OBJECT_X] + 16, powerup1_state[OBJECT_Y] + 16);
-    move_sprite(4, powerup2_state[OBJECT_X] + 8, powerup2_state[OBJECT_Y] + 16);
-    move_sprite(5, powerup2_state[OBJECT_X] + 16, powerup2_state[OBJECT_Y] + 16);
-    move_sprite(6, powerup3_state[OBJECT_X] + 8, powerup3_state[OBJECT_Y] + 16);
-    move_sprite(7, powerup3_state[OBJECT_X] + 16, powerup3_state[OBJECT_Y] + 16);
+    move_sprite(2, powerup1_state[OBJECT_X] + 8, powerup1_state[OBJECT_Y] + 8);
+    move_sprite(3, powerup2_state[OBJECT_X] + 8, powerup2_state[OBJECT_Y] + 8);
+    move_sprite(4, powerup3_state[OBJECT_X] + 8, powerup3_state[OBJECT_Y] + 8);
+}
+
+void UpdateAll(){
+    UpdatePlayer();
+    UpdateBackground();
+    UpdatePowerups();
+    UpdateEffects();
+    UpdateSound();
 }
 
 void checkPowerUpCollisions(){
-    if(collisionStateCheck(player_state,powerup1_state)){
+    if(collisionStateCheck(player_state,powerup1_state) && player_powerup < 1 && player_is_on_floor){
         player_powerup = 1;
         // hide power up
         powerup1_state[OBJECT_TILE] = 0;
         // stop power up from being collideable
         powerup1_state[OBJECT_W] = 0;
         powerup1_state[OBJECT_H] = 0;
-    } else if(collisionStateCheck(player_state,powerup2_state)){
+        PlayNote(C4_LR,C4_HR);
+    } else if(collisionStateCheck(player_state,powerup2_state) && player_powerup < 2 && player_is_on_floor){
         player_powerup = 2;
         // hide power up
         powerup2_state[OBJECT_TILE] = 0;
         // stop power up from being collideable
         powerup2_state[OBJECT_W] = 0;
         powerup2_state[OBJECT_H] = 0;
-    } else if(collisionStateCheck(player_state,powerup3_state)){
+        PlayNote(E4_LR,E4_HR);
+    } else if(collisionStateCheck(player_state,powerup3_state) && player_powerup < 3 && player_is_on_floor){
         player_powerup = 3;
         // hide power up
         powerup3_state[OBJECT_TILE] = 0;
         // stop power up from being collideable
         powerup3_state[OBJECT_W] = 0;
         powerup3_state[OBJECT_H] = 0;
+        PlayNote(G4_LR,G4_HR);
     }
 }
 
@@ -421,22 +420,22 @@ void setupLevel(UINT8 level){
         platform5_state[OBJECT_W] = 0;
         platform5_state[OBJECT_H] = 0;
 
-        powerup1_state[OBJECT_X] = 40;
-        powerup1_state[OBJECT_Y] = 96;
-        powerup1_state[OBJECT_W] = 16;
-        powerup1_state[OBJECT_H] = 16;
+        powerup1_state[OBJECT_X] = 48;
+        powerup1_state[OBJECT_Y] = 104;
+        powerup1_state[OBJECT_W] = 8;
+        powerup1_state[OBJECT_H] = 8;
         powerup1_state[OBJECT_TILE] = 0;
 
-        powerup2_state[OBJECT_X] = 10;
-        powerup2_state[OBJECT_Y] = 96;
-        powerup2_state[OBJECT_W] = 16;
-        powerup2_state[OBJECT_H] = 16;
+        powerup2_state[OBJECT_X] = 18;
+        powerup2_state[OBJECT_Y] = 104;
+        powerup2_state[OBJECT_W] = 8;
+        powerup2_state[OBJECT_H] = 8;
         powerup2_state[OBJECT_TILE] = 0;
 
-        powerup3_state[OBJECT_X] = 120;
-        powerup3_state[OBJECT_Y] = 96;
-        powerup3_state[OBJECT_W] = 16;
-        powerup3_state[OBJECT_H] = 16;
+        powerup3_state[OBJECT_X] = 128;
+        powerup3_state[OBJECT_Y] = 104;
+        powerup3_state[OBJECT_W] = 8;
+        powerup3_state[OBJECT_H] = 8;
         powerup3_state[OBJECT_TILE] = 0;
 
     } else if (level == 2){
@@ -559,22 +558,22 @@ void setupLevel(UINT8 level){
         platform5_state[OBJECT_W] = 16;
         platform5_state[OBJECT_H] = 16;
 
-        powerup1_state[OBJECT_X] = 40;
-        powerup1_state[OBJECT_Y] = 80;
-        powerup1_state[OBJECT_W] = 16;
-        powerup1_state[OBJECT_H] = 16;
+        powerup1_state[OBJECT_X] = 48;
+        powerup1_state[OBJECT_Y] = 88;
+        powerup1_state[OBJECT_W] = 8;
+        powerup1_state[OBJECT_H] = 8;
         powerup1_state[OBJECT_TILE] = 0;
 
-        powerup2_state[OBJECT_X] = 8;
-        powerup2_state[OBJECT_Y] = 48;
-        powerup2_state[OBJECT_W] = 16;
-        powerup2_state[OBJECT_H] = 16;
+        powerup2_state[OBJECT_X] = 16;
+        powerup2_state[OBJECT_Y] = 56;
+        powerup2_state[OBJECT_W] = 8;
+        powerup2_state[OBJECT_H] = 8;
         powerup2_state[OBJECT_TILE] = 0;
 
-        powerup3_state[OBJECT_X] = 136;
-        powerup3_state[OBJECT_Y] = 104;
-        powerup3_state[OBJECT_W] = 16;
-        powerup3_state[OBJECT_H] = 16;
+        powerup3_state[OBJECT_X] = 144;
+        powerup3_state[OBJECT_Y] = 112;
+        powerup3_state[OBJECT_W] = 8;
+        powerup3_state[OBJECT_H] = 8;
         powerup3_state[OBJECT_TILE] = 0;
 
     } else if (level == 5){
@@ -611,16 +610,16 @@ void setupLevel(UINT8 level){
         powerup1_state[OBJECT_H] = 0;
         powerup1_state[OBJECT_TILE] = 0;
 
-        powerup2_state[OBJECT_X] = 104;
-        powerup2_state[OBJECT_Y] = 88;
-        powerup2_state[OBJECT_W] = 16;
-        powerup2_state[OBJECT_H] = 16;
+        powerup2_state[OBJECT_X] = 112;
+        powerup2_state[OBJECT_Y] = 104;
+        powerup2_state[OBJECT_W] = 8;
+        powerup2_state[OBJECT_H] = 8;
         powerup2_state[OBJECT_TILE] = 0;
 
-        powerup3_state[OBJECT_X] = 88;
-        powerup3_state[OBJECT_Y] = 48;
-        powerup3_state[OBJECT_W] = 16;
-        powerup3_state[OBJECT_H] = 16;
+        powerup3_state[OBJECT_X] = 96;
+        powerup3_state[OBJECT_Y] = 56;
+        powerup3_state[OBJECT_W] = 8;
+        powerup3_state[OBJECT_H] = 8;
         powerup3_state[OBJECT_TILE] = 0;
 
     } else if (level == 6){
@@ -663,10 +662,10 @@ void setupLevel(UINT8 level){
         powerup2_state[OBJECT_H] = 0;
         powerup2_state[OBJECT_TILE] = 0;
 
-        powerup3_state[OBJECT_X] = 16;
-        powerup3_state[OBJECT_Y] = 104;
-        powerup3_state[OBJECT_W] = 16;
-        powerup3_state[OBJECT_H] = 16;
+        powerup3_state[OBJECT_X] = 24;
+        powerup3_state[OBJECT_Y] = 112;
+        powerup3_state[OBJECT_W] = 8;
+        powerup3_state[OBJECT_H] = 8;
         powerup3_state[OBJECT_TILE] = 0;
     } else if (level == 7){
         set_bkg_data(0, 19, levelTiles ); //load background tile set
@@ -721,6 +720,7 @@ void EffectDeathAnim(UINT8 frame_time){
         if (player_death_frame_index == 0){
             effect1_state[OBJECT_TILE] = 0; //set player type to attack frame 1
             background_type = 1;
+            PlaySlide(C4_LR,C4_HR,1);
         } else if (player_death_frame_index == 1){
             effect1_state[OBJECT_TILE] = 1; //set player type to attack frame 1
             background_type = 3;
@@ -777,24 +777,46 @@ void PlayerAttackAnim(UINT8 frame_time){
         } else if (player_attack_frame_index == 6) {
             player_state[OBJECT_TILE] = 11; //set player type to attack frame 5
             background_type = 2;
+            PlayNote(C3_LR,C3_HR);
         } else if (player_attack_frame_index == 7) {
             player_state[OBJECT_TILE] = 11; //set player type to attack frame 5
             background_type = 2;
         } else if (player_attack_frame_index == 8) {
             player_state[OBJECT_TILE] = 12; //set player type to attack frame 6
             background_type = 3;
+            if (new_level){
+                if (level_num == 1){
+                    PlayNote(G4_LR,G4_HR);
+                } else {
+                    PlayNote(C4_LR,C4_HR);
+                }
+            }
+            //play_shake2_sound = 1;
         } else if (player_attack_frame_index == 9) {
             player_state[OBJECT_TILE] = 12; //set player type to attack frame 6
             background_type = 3;
         } else if (player_attack_frame_index == 10) {
             player_state[OBJECT_TILE] = 10; //set player type to attack frame 4
             background_type = 1;
+            if (new_level){
+                if (level_num == 1){
+                    PlayNote(G4_LR,G4_HR);
+                } else {
+                    PlayNote(G4_LR,G4_HR);
+                }
+            }
+            //play_shake1_sound = 1;
         } else if (player_attack_frame_index == 11) {
             player_state[OBJECT_TILE] = 10; //set player type to attack frame 4
             background_type = 1;
         } else if (player_attack_frame_index == 12) {
             player_state[OBJECT_TILE] = 10; //set player type to attack frame 4
             background_type = 1;
+            if (new_level){
+                if (level_num == 1){
+                    PlayNote(C5_LR,C5_HR);
+                }
+            }
         } else if (player_attack_frame_index == 13) {
             player_state[OBJECT_TILE] = 10; //set player type to attack frame 4
             background_type = 1;
@@ -825,9 +847,7 @@ void transition(UINT8 next_level){
     powerup3_state[OBJECT_H] = 0;
 
     background_type = 0;
-    UpdatePowerups();
-    UpdatePlayer();
-    UpdateBackground();
+    UpdateAll();
     set_bkg_palette(0, 1, bkgPalette_blank); //keep background hidden
     wait_vbl_done();
     setupLevel(next_level);
@@ -850,7 +870,7 @@ void transition(UINT8 next_level){
         } else {
             reached_y = 1;
         }
-        UpdatePlayer();
+        UpdateAll();
         set_bkg_palette(0, 1, bkgPalette_blank); //keep background hidden
         wait_vbl_done();
     }
@@ -915,7 +935,6 @@ void checkLevelComplete(){
             new_level = 1;
         }
     }else if (level_num == 7){
-        //TODO add ending effects, delay restart for a few seconds
         test_player_state[OBJECT_Y] = player_state[OBJECT_Y] + 1;
         if (collisionStateCheck(test_player_state,platform1_state)){ //on last platform
             new_level = 1;
@@ -935,9 +954,7 @@ void Death(){
         wait_vbl_done();
         updateKeys();
         EffectDeathAnim(10);
-        UpdatePlayer();
-        UpdateBackground();
-        UpdateEffects();
+        UpdateAll();
         if (death_anim_complete == 1){
             death_anim_complete = 0;
             player_death_frame_index = 0;
@@ -957,9 +974,7 @@ void Death(){
     powerup3_state[OBJECT_H] = 0;
 
     background_type = 0;
-    UpdatePowerups();
-    UpdatePlayer();
-    UpdateBackground();
+    UpdateAll();
     set_bkg_palette(0, 1, bkgPalette_blank); //keep background hidden
     wait_vbl_done();
     setupLevel(level_num);
@@ -998,7 +1013,8 @@ void main() {
     player_death_frame_index = 0;
 
     level_num = 1;
-    bkg_x = 0, bkg_y = 0;
+    new_level = 0;
+
     player_jump_count = 0;
     player_walk_count = 0;
     player_is_jumping = 0;
@@ -1023,18 +1039,15 @@ void main() {
 	scroll_bkg(0, 0);
     SHOW_BKG;
 
-    new_level = 0;
-
     // initalise character sprite
     SPRITES_8x16;
     PlayerInit();
-    UpdatePlayer();
-    UpdateBackground();
     PowerupsInit();
-    UpdatePowerups();
     EffectsInit();
-    UpdateEffects();
+    UpdateAll();
     SHOW_SPRITES; // display sprites
+
+    initSound();
 
     // game loop
     while(1) {
@@ -1086,6 +1099,7 @@ void main() {
                         //jump
                         player_jump_count++;
                         if (player_jump_count < 25){ // restrict jump time
+                            PlaySlide(D3_LR,D3_HR,0);
                             // accelleration arch to jump
                             if (player_jump_count < 3){
                                 player_move_y-=1;
@@ -1109,7 +1123,7 @@ void main() {
                     }
                 }
             } else if (player_powerup == 1){ //small boost jump
-                if (time_boosting < 30){
+                if (time_boosting < 20){
                     if(keyPressed(J_A)) {
                         time_boosting++;
                         //jump
@@ -1135,6 +1149,8 @@ void main() {
                         if (player_jump_count < 30){ // restrict jump time
                             player_move_y-=3;
                             player_is_jumping = 1;
+                            PlayNote(C3_LR,C3_HR);
+                            //PlaySlide(C3_LR,C3_HR,1);
                         } else {
                             player_jump_count = 30;
                             player_is_jumping = 0;
@@ -1145,7 +1161,7 @@ void main() {
                     }
                 }
             } else if (player_powerup == 3){ // large boost jump
-                if (time_boosting < 80){
+                if (time_boosting < 90){
                     if(keyPressed(J_A)) {
                         time_boosting++;
                         //jump
@@ -1153,6 +1169,7 @@ void main() {
                         if (player_jump_count < 50){ // restrict jump time
                             player_move_y-=3;
                             player_is_jumping = 1;
+                            PlayNote(C3_LR,C3_HR);
                         } else {
                             player_jump_count = 50;
                             player_is_jumping = 0;
@@ -1214,7 +1231,7 @@ void main() {
             background_type = 0;
             if (player_powerup == 0){
                 if (player_is_jumping == 1){
-                    player_state[OBJECT_TILE] = 4; //set player type to walk frame 3
+                    player_state[OBJECT_TILE] = 13; //set player type to walk frame 3
                 } else {
                     player_state[OBJECT_TILE] = 3; //set player type to walk frame 2
                 }
@@ -1256,10 +1273,7 @@ void main() {
             }
         }
 
-        UpdatePlayer();
-        UpdateBackground();
-        UpdatePowerups();
-        UpdateEffects();
+        UpdateAll();
 
         checkPowerUpCollisions();
 
@@ -1284,9 +1298,7 @@ void main() {
                 wait_vbl_done();
                 updateKeys();
                 PlayerAttackAnim(5);
-                UpdatePlayer();
-                UpdatePowerups();
-                UpdateBackground();
+                UpdateAll();
                 if (attack_anim_complete == 1){
                     attack_anim_complete = 0;
                     break;
@@ -1298,9 +1310,7 @@ void main() {
                     wait_vbl_done();
                     updateKeys();
                     PlayerAttackAnim(5);
-                    UpdatePlayer();
-                    UpdatePowerups();
-                    UpdateBackground();
+                    UpdateAll();
                 }
             } else if (level_num == 5){
                 checkpoint_level = 5;
@@ -1312,9 +1322,7 @@ void main() {
                     wait_vbl_done();
                     updateKeys();
                     PlayerAttackAnim(5);
-                    UpdatePlayer();
-                    UpdatePowerups();
-                    UpdateBackground();
+                    UpdateAll();
                 }
             }
             player_attack_frame_index = 0;
@@ -1322,9 +1330,6 @@ void main() {
             player_state[OBJECT_TILE] = 10; 
             transition(level_num);
             player_attack_frame_index = 0;
-            //setupLevel(level_num);
-            //player_state[OBJECT_X] = level_start_xs[level_num-1];
-            //player_state[OBJECT_Y] = level_start_ys[level_num-1];
             new_level = 0;
         }
 
