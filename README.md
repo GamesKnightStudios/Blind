@@ -5,7 +5,7 @@ BLIND, by Games Knight Studios.
 Created as part of GBJam8 on itch.io
 
 # Latest release
-Get the latest release on [itch.io](https://itch.io/jam/blind)
+Get the latest release on [itch.io](https://gamesknightstudios.itch.io/blind)
 
 # Developer Zone
 The full source code for this game is avaiable as OpenSource. Instructions for building from source are provided below.
